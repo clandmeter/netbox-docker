@@ -1,0 +1,47 @@
+version: '3'
+services:
+  netbox: &netbox
+    image: clandmeter/netbox-docker
+    build: .
+    volumes:
+      - static:/srv/netbox/static
+      - media:/srv/netbox/media
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NETBOX_ADMIN_USER
+      - NETBOX_ADMIN_EMAIL
+      - NETBOX_ADMIN_PASS
+      - NETBOX_SECRET_KEY
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+  redis:
+    image: redis:5-alpine
+    restart: always
+    volumes:
+      - redis:/data
+    entrypoint: redis-server --appendonly yes
+  postgres:
+    image: postgres:11-alpine
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+  nginx:
+    image: nginx:1-alpine
+    restart: always
+    depends_on:
+      - netbox
+    volumes:
+      - static:/var/www/static:ro
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8081:80"
+volumes:
+  redis:
+  postgres:
+  static:
+  media:

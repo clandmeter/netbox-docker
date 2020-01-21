@@ -1,0 +1,55 @@
+--- /srv/netbox/netbox/configuration.py
++++ /srv/netbox/netbox/configuration.py
+@@ -1,3 +1,5 @@
++import os
++
+ #########################
+ #                       #
+ #   Required settings   #
+@@ -8,14 +10,14 @@
+ # access to the server via any other hostnames. The first FQDN in the list will be treated as the preferred name.
+ #
+ # Example: ALLOWED_HOSTS = ['netbox.example.com', 'netbox.internal.local']
+-ALLOWED_HOSTS = []
++ALLOWED_HOSTS = [ "netbox" ]
+ 
+ # PostgreSQL database configuration.
+ DATABASE = {
+-    'NAME': 'netbox',         # Database name
+-    'USER': '',               # PostgreSQL username
+-    'PASSWORD': '',           # PostgreSQL password
+-    'HOST': 'localhost',      # Database server
++    'NAME': os.environ.get('POSTGRES_USER'),         # Database name
++    'USER': os.environ.get('POSTGRES_USER'),         # PostgreSQL username
++    'PASSWORD': os.environ.get('POSTGRES_PASSWORD'), # PostgreSQL password
++    'HOST': 'postgres',       # Database server
+     'PORT': '',               # Database port (leave blank for default)
+     'CONN_MAX_AGE': 300,      # Max database connection age
+ }
+@@ -25,7 +27,7 @@ DATABASE = {
+ # Full connection details are required in both sections, even if they are the same.
+ REDIS = {
+     'webhooks': {
+-        'HOST': 'localhost',
++        'HOST': 'redis',
+         'PORT': 6379,
+         'PASSWORD': '',
+         'DATABASE': 0,
+@@ -33,7 +35,7 @@ REDIS = {
+         'SSL': False,
+     },
+     'caching': {
+-        'HOST': 'localhost',
++        'HOST': 'redis',
+         'PORT': 6379,
+         'PASSWORD': '',
+         'DATABASE': 1,
+@@ -46,7 +48,7 @@ REDIS = {
+ # For optimal security, SECRET_KEY should be at least 50 characters in length and contain a mix of letters, numbers, and
+ # symbols. NetBox will not run without this defined. For more information, see
+ # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-SECRET_KEY
+-SECRET_KEY = ''
++SECRET_KEY = os.environ.get('NETBOX_SECRET_KEY')
+ 
+ 
+ #########################
